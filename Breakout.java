@@ -14,6 +14,7 @@ import acm.util.*;
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Writer;
 
 public class Breakout extends GraphicsProgram {
 
@@ -56,11 +57,182 @@ public class Breakout extends GraphicsProgram {
 
 /** Number of turns */
 	private static final int NTURNS = 3;
-
+/** Random Colours */
+ 	private RandomGenerator rgen = RandomGenerator.getInstance();
+ 	
+ 	private GRect paddle;
+ 	private GRect brick;
+ 	private GOval ball;
+ 	private double vx, vy;
+ 	
+ 	/* Others Methods */
+ 	private void setUpGame() {
+		drawBricks();
+		drawPaddle();
+		drawBall();
+	}
+ 	
+ 	
+ 	private void drawBricks(){
+ 		double x=0;
+ 		double y=BRICK_Y_OFFSET;
+ 	
+		 for(int i=0;i<NBRICK_ROWS;i++){
+			 x=0;
+			 for(int j=0;j<NBRICKS_PER_ROW;j++){
+			 brick = new GRect(x,y,BRICK_WIDTH,BRICK_HEIGHT);
+			 if(i==0 || i==1)
+				{
+					brick.setFilled(true);
+					brick.setFillColor(Color.RED);
+					
+				}
+			 else if(i==2 || i==3)
+			 {
+				 brick.setFilled(true);
+				 brick.setFillColor(Color.ORANGE);
+				 
+			 }
+			 else if(i==4 || i==5)
+			 {
+				 brick.setFilled(true);
+				 brick.setFillColor(Color.YELLOW);
+				 
+			 }
+			 else if(i==6 || i==7)
+			 {
+				 brick.setFilled(true);
+				 brick.setFillColor(Color.GREEN);
+				 
+			 }
+			 else if(i==8 || i==9)
+			 {
+				 brick.setFilled(true);
+				 brick.setFillColor(Color.CYAN);
+				 
+			 }
+			 add(brick);
+			 x=x+BRICK_SEP*NBRICK_ROWS;
+			 }
+			 y=y+BRICK_HEIGHT+2;
+		 }
+ 	}
+ 	
+ 	private void drawPaddle() {
+		
+		double x = WIDTH/2; 
+		
+		double y = HEIGHT - PADDLE_Y_OFFSET;
+		
+		paddle = new GRect (x, y, PADDLE_WIDTH, PADDLE_HEIGHT);
+		
+		paddle.setFilled(true);
+		
+		add (paddle);
+		
+		addMouseListeners();
+	}
+ 	
+ 	private void drawBall(){
+ 		
+ 		double x = (WIDTH+PADDLE_WIDTH)/2; 
+		double y = HEIGHT-PADDLE_Y_OFFSET-10;
+		boolean xflag = false;
+		boolean yflag = false;
+		
+		while(true){
+		
+		
+		ball = new GOval(x, y, BALL_RADIUS, BALL_RADIUS);
+		ball.setColor(Color.BLACK);
+		
+		ball.setFilled(true);
+		add(ball);
+		
+		
+	    try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//sleep(30);
+	    
+	    
+	    //x direction
+	    
+	    if(x >= WIDTH-10)
+	    	xflag = true;
+	    
+	    else if(x <= 0)
+	    	xflag = false;
+	    
+	    
+	    if(xflag == true)
+	    	x-=5;
+	    
+	    else
+	    	x+=5;
+	    
+	    
+	    
+	    // y direction...
+	    if(y <= 0)
+	    	yflag = true;
+	    
+	    else if(y >= (HEIGHT-PADDLE_Y_OFFSET-7))
+	    	yflag = false;
+	    
+	    
+	    if(yflag == true)
+	    	y+=5;
+	    
+	    else
+	    	y-=5;
+	    
+	   //remove(ball);		
+		} 		
+ 	}
+ 	
+ 	public void mouseMoved(MouseEvent e) {
+		 	
+ 			if(PADDLE_WIDTH - e.getX() > 0)
+ 				paddle.setLocation(0, getHeight() - PADDLE_Y_OFFSET);		
+	
+ 			else
+ 				paddle.setLocation(e.getX() - PADDLE_WIDTH, getHeight() - PADDLE_Y_OFFSET);	
+ 	}
+ 	
+ 	private void BallVelocity() {
+		
+		vx = rgen.nextDouble(1.0, 3.0);
+		vy = 5.0;
+		if (rgen.nextBoolean(0.5)) {
+			vx = -vx; 
+		}
+		
+	}
+ 	
+ 	private void startGame(){
+ 		waitForClick();
+ 		
+ 		
+ 		
+ 	}
+	
+ 	
 /* Method: run() */
 /** Runs the Breakout program. */
 	public void run() {
-		/* You fill this in, along with any subsidiary methods */
+		setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
+		
+	for(int i=0; i < NTURNS; i++) {
+			setUpGame();
+			} 
+		
+		
+		
 	}
 
 }
