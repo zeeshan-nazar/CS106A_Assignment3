@@ -64,23 +64,24 @@ public class Breakout extends GraphicsProgram {
  	private GRect brick;
  	private GOval ball;
  	private double vx, vy;
+ 	private int bricks_counter = 100;
  	
  	/* Others Methods */
  	private void setUpGame() {
 		drawBricks();
 		drawPaddle();
-		drawBall();
+		//drwaAndMoveBall();
 	}
  	
  	
  	private void drawBricks(){
- 		double x=0;
- 		double y=BRICK_Y_OFFSET;
+ 		double x_coordinate=1;
+ 		double y_coordinate=BRICK_Y_OFFSET;
  	
 		 for(int i=0;i<NBRICK_ROWS;i++){
-			 x=0;
+			 x_coordinate=1;
 			 for(int j=0;j<NBRICKS_PER_ROW;j++){
-			 brick = new GRect(x,y,BRICK_WIDTH,BRICK_HEIGHT);
+			 brick = new GRect(x_coordinate,y_coordinate,BRICK_WIDTH,BRICK_HEIGHT);
 			 if(i==0 || i==1)
 				{
 					brick.setFilled(true);
@@ -112,15 +113,15 @@ public class Breakout extends GraphicsProgram {
 				 
 			 }
 			 add(brick);
-			 x=x+BRICK_SEP*NBRICK_ROWS;
+			 x_coordinate=x_coordinate+BRICK_SEP*NBRICK_ROWS;
 			 }
-			 y=y+BRICK_HEIGHT+2;
+			 y_coordinate=y_coordinate+BRICK_HEIGHT+2;
 		 }
  	}
  	
  	private void drawPaddle() {
 		
-		double x = WIDTH/2; 
+ 		double x = WIDTH/2; 
 		
 		double y = HEIGHT - PADDLE_Y_OFFSET;
 		
@@ -133,17 +134,27 @@ public class Breakout extends GraphicsProgram {
 		addMouseListeners();
 	}
  	
- 	private void drawBall(){
+ 	public void mouseMoved(MouseEvent e) {
+	 	
+			if(PADDLE_WIDTH - e.getX() > 0)
+				paddle.setLocation(0, getHeight() - PADDLE_Y_OFFSET);		
+
+			else
+				paddle.setLocation(e.getX() - PADDLE_WIDTH, getHeight() - PADDLE_Y_OFFSET);	
+	}
+ 	
+ 	
+ 	private void drwaAndMoveBall(){
  		
- 		double x = (WIDTH+PADDLE_WIDTH)/2; 
-		double y = HEIGHT-PADDLE_Y_OFFSET-10;
-		boolean xflag = false;
-		boolean yflag = false;
+ 		double x_coordinate = (WIDTH+PADDLE_WIDTH)/2; 
+		double y_coordinate = HEIGHT-PADDLE_Y_OFFSET-10;
+		boolean x_coordinate_flag = false;
+		boolean y_coordinate_flag = false;
 		
 		while(true){
 		
 		
-		ball = new GOval(x, y, BALL_RADIUS, BALL_RADIUS);
+		ball = new GOval(x_coordinate, y_coordinate, BALL_RADIUS, BALL_RADIUS);
 		ball.setColor(Color.BLACK);
 		
 		ball.setFilled(true);
@@ -151,60 +162,62 @@ public class Breakout extends GraphicsProgram {
 		
 		
 	    try {
-			Thread.sleep(100);
+			Thread.sleep(30);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
-		
-		//sleep(30);
-	    
-	    
+	
 	    //x direction
 	    
-	    if(x >= WIDTH-10)
-	    	xflag = true;
+	    if(x_coordinate >= WIDTH-10)
+	    	x_coordinate_flag = true;
 	    
-	    else if(x <= 0)
-	    	xflag = false;
+	    else if(x_coordinate <= 0)
+	    	x_coordinate_flag = false;
 	    
 	    
-	    if(xflag == true)
-	    	x-=5;
+	    if(x_coordinate_flag == true)
+	    	x_coordinate-=5;
 	    
 	    else
-	    	x+=5;
+	    	x_coordinate+=5;
 	    
 	    
 	    
 	    // y direction...
-	    if(y <= 0)
-	    	yflag = true;
+	    if(y_coordinate <= 0){
+	    	y_coordinate_flag = true;
+	    }
 	    
-	    else if(y >= (HEIGHT-PADDLE_Y_OFFSET-7))
-	    	yflag = false;
+	    else if(y_coordinate >= (HEIGHT-PADDLE_Y_OFFSET-7)){
+	    	y_coordinate_flag = false;
+	    }
 	    
+	    if(y_coordinate_flag == true){
+	    	y_coordinate+=5;
+	    }
 	    
-	    if(yflag == true)
-	    	y+=5;
+	    else{
+	    	y_coordinate-=5;
+	    }
 	    
-	    else
-	    	y-=5;
-	    
-	   //remove(ball);		
+	   remove(ball);		
 		} 		
  	}
- 	
- 	public void mouseMoved(MouseEvent e) {
-		 	
- 			if(PADDLE_WIDTH - e.getX() > 0)
- 				paddle.setLocation(0, getHeight() - PADDLE_Y_OFFSET);		
-	
- 			else
- 				paddle.setLocation(e.getX() - PADDLE_WIDTH, getHeight() - PADDLE_Y_OFFSET);	
+ 		
+ 	private GObject getCollidingObject(){
+ 		if((getElementAt(ball.getX(), ball.getY())) != null) {
+	         return getElementAt(ball.getX(), ball.getY());
+	      }
+		
+		else{
+	         return null;
+	      }
  	}
  	
- 	private void BallVelocity() {
+ 	
+private void BallVelocity() {
 		
 		vx = rgen.nextDouble(1.0, 3.0);
 		vy = 5.0;
@@ -214,13 +227,18 @@ public class Breakout extends GraphicsProgram {
 		
 	}
  	
+ 	
+ 	
  	private void startGame(){
  		waitForClick();
- 		
- 		
+ 		drwaAndMoveBall();
+ 		GObject collider = getCollidingObject();
  		
  	}
-	
+ 		
+ 	
+ 	
+
  	
 /* Method: run() */
 /** Runs the Breakout program. */
@@ -229,6 +247,7 @@ public class Breakout extends GraphicsProgram {
 		
 	for(int i=0; i < NTURNS; i++) {
 			setUpGame();
+			startGame();
 			} 
 		
 		
