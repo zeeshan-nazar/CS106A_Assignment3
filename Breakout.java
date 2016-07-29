@@ -227,13 +227,31 @@ private void BallVelocity() {
 		
 	}
  	
- 	
+ 	private void ballCollide(){
+ 		
+ 		drwaAndMoveBall();
+ 		
+ 		GObject collider = getCollidingObject();
+ 		
+ 		if(collider == paddle){
+ 			
+ 			drwaAndMoveBall();
+ 		}
+ 		
+ 		else if (collider ==  brick){
+ 			remove(brick);
+ 		}
+ 		
+ 		else{
+ 			setUpGame();
+ 		}
+
+ 	}
  	
  	private void startGame(){
  		waitForClick();
- 		drwaAndMoveBall();
- 		GObject collider = getCollidingObject();
- 		
+ 		//drwaAndMoveBall();
+ 		ballCollide();
  	}
  		
  	
