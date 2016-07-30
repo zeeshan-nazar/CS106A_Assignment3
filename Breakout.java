@@ -65,12 +65,13 @@ public class Breakout extends GraphicsProgram {
  	private GOval ball;
  	private double vx, vy;
  	private int bricks_counter = 100;
+ 	private static final int sleep = 10;
  	
  	/* Others Methods */
  	private void setUpGame() {
 		drawBricks();
 		drawPaddle();
-		//drwaAndMoveBall();
+		drawBall();
 	}
  	
  	
@@ -144,12 +145,11 @@ public class Breakout extends GraphicsProgram {
 	}
  	
  	
- 	private void drwaAndMoveBall(){
+ 	private void drawBall(){
  		
  		double x_coordinate = (WIDTH+PADDLE_WIDTH)/2; 
 		double y_coordinate = HEIGHT-PADDLE_Y_OFFSET-10;
-		boolean x_coordinate_flag = false;
-		boolean y_coordinate_flag = false;
+		
 		
 		while(true){
 		
@@ -160,9 +160,23 @@ public class Breakout extends GraphicsProgram {
 		ball.setFilled(true);
 		add(ball);
 		
+	move(ball);
 		
-	    try {
-			Thread.sleep(30);
+		}
+		
+	    
+ 	}
+ 	
+ private void move(GOval ball){
+ 		
+ 		double x_coordinate = (WIDTH+PADDLE_WIDTH)/2; 
+		double y_coordinate = HEIGHT-PADDLE_Y_OFFSET-10;
+ 		
+		boolean x_coordinate_flag = false;
+		boolean y_coordinate_flag = false;
+		
+		try {
+			Thread.sleep(20);
 		} catch (InterruptedException e) {
 			
 			e.printStackTrace();
@@ -178,10 +192,10 @@ public class Breakout extends GraphicsProgram {
 	    
 	    
 	    if(x_coordinate_flag == true)
-	    	x_coordinate-=5;
+	    	x_coordinate-=2;
 	    
 	    else
-	    	x_coordinate+=5;
+	    	x_coordinate+=4;
 	    
 	    
 	    
@@ -195,20 +209,30 @@ public class Breakout extends GraphicsProgram {
 	    }
 	    
 	    if(y_coordinate_flag == true){
-	    	y_coordinate+=5;
+	    	y_coordinate+=4;
 	    }
 	    
 	    else{
-	    	y_coordinate-=5;
+	    	y_coordinate-=4;
 	    }
 	    
-	   remove(ball);		
-		} 		
- 	}
+	   remove(ball);
+		} 	
+ 
+ 		
  		
  	private GObject getCollidingObject(){
  		if((getElementAt(ball.getX(), ball.getY())) != null) {
 	         return getElementAt(ball.getX(), ball.getY());
+	      }
+		else if (getElementAt( (ball.getX() + BALL_RADIUS*2), ball.getY()) != null ){
+	         return getElementAt(ball.getX() + BALL_RADIUS*2, ball.getY());
+	      }
+		else if(getElementAt(ball.getX(), (ball.getY() + BALL_RADIUS*2)) != null ){
+	         return getElementAt(ball.getX(), ball.getY() + BALL_RADIUS*2);
+	      }
+		else if(getElementAt((ball.getX() + BALL_RADIUS*2), (ball.getY() + BALL_RADIUS*2)) != null ){
+	         return getElementAt(ball.getX() + BALL_RADIUS*2, ball.getY() + BALL_RADIUS*2);
 	      }
 		
 		else{
@@ -217,41 +241,47 @@ public class Breakout extends GraphicsProgram {
  	}
  	
  	
-private void BallVelocity() {
+private void ballVelocity() {
 		
 		vx = rgen.nextDouble(1.0, 3.0);
-		vy = 5.0;
+		vy = 4.0;
 		if (rgen.nextBoolean(0.5)) {
 			vx = -vx; 
 		}
 		
 	}
  	
- 	private void ballCollide(){
+ private void ballCollide(){
  		
- 		drwaAndMoveBall();
+ 		while(true){
+ 		drawBall();
  		
  		GObject collider = getCollidingObject();
  		
  		if(collider == paddle){
  			
- 			drwaAndMoveBall();
+ 			drawBall();
  		}
  		
- 		else if (collider ==  brick){
- 			remove(brick);
- 		}
+ 		else {
+ 				break;
+ 			}
  		
- 		else{
- 			setUpGame();
  		}
-
  	}
  	
  	private void startGame(){
  		waitForClick();
- 		//drwaAndMoveBall();
- 		ballCollide();
+		//ballVelocity();
+		while (true) {
+			move(ball);
+			if (ball.getY() >= getHeight()) {
+				break;
+			}
+			if(bricks_counter == 0) {
+				break;
+			}
+		}
  	}
  		
  	
