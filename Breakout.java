@@ -65,7 +65,7 @@ public class Breakout extends GraphicsProgram {
  	private GOval ball;
  	private double vx, vy;
  	private int bricks_counter = 100;
- 	private static final int sleep = 20;
+ 	private static final int sleep = 30;
  	
  	/* Others Methods */
  	private void setUpGame() {
@@ -153,6 +153,20 @@ public class Breakout extends GraphicsProgram {
 		boolean x_coordinate_flag = false;
 		boolean y_coordinate_flag = false;
 		
+		
+		int randomMovment = rgen.nextInt(1,2);
+		//double randomMovment=	ballVelocity();
+		
+		if(randomMovment == 1){
+		 x_coordinate_flag = false;
+		 y_coordinate_flag = false;
+		}
+		
+		else if(randomMovment == 2){
+			x_coordinate_flag = true;
+			 y_coordinate_flag = true;
+		}
+
 		while(true){
 		
 		
@@ -187,7 +201,27 @@ public class Breakout extends GraphicsProgram {
 	    else if(y_coordinate >= (HEIGHT-PADDLE_Y_OFFSET - 7)){
 	    	y_coordinate_flag = false;
 	    	
-	    		    }
+	    	if(getElementAt(x_coordinate, y_coordinate + 7) == null)		//exit condition, if paddle not found...
+	    	{
+	    		break;
+	    	}
+	    }
+
+	    
+	    for(int i = 0; i<NBRICK_ROWS; i++)
+	    {
+	    	for(int j = 0; j<NBRICKS_PER_ROW; j++)
+	    	{
+	    		GObject removeBricks = getElementAt(x_coordinate, y_coordinate);
+	    		
+	    		if(removeBricks != null)
+	    		{
+	    			remove(removeBricks);
+	    			y_coordinate_flag = true;
+	    		}
+	    	}
+	    }
+	    
 
 	    // moving the ball in x and y...
 	    
@@ -244,6 +278,8 @@ private double ballVelocity() {
 	for(int i=0; i < NTURNS; i++) {
 			
 			startGame();
+			remove(ball);
+			remove(paddle);
 			
 			} 
 		
