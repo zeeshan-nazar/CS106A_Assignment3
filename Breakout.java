@@ -14,6 +14,7 @@ import acm.util.*;
 import java.applet.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Writer;
 
 public class Breakout extends GraphicsProgram {
 
@@ -56,11 +57,274 @@ public class Breakout extends GraphicsProgram {
 
 /** Number of turns */
 	private static final int NTURNS = 3;
+/** Random Colours */
+ 	private RandomGenerator rgen = RandomGenerator.getInstance();
+ 	
+ 	private GRect paddle;
+ 	private GRect [][]brick;
+ 	private GOval ball;
+ 	private double vx, vy;
+ 	private int bricks_counter = 100;
+ 	private static final int sleep = 30;
+ 	
+ 	/* Others Methods */
+ 	private void setUpGame() {
+		drawBricks();
+		drawPaddle();
+		drawBall();
+	}
+ 	
+ 	
+ 	private void drawBricks(){
+ 		double x_coordinate=1;
+ 		double y_coordinate=BRICK_Y_OFFSET;
+ 		 brick = new GRect[10][10];
+ 		
+		 for(int i=0;i<NBRICK_ROWS;i++){
+			 x_coordinate=1;
+			 for(int j=0;j<NBRICKS_PER_ROW;j++){
+			 brick[i][j] = new GRect(x_coordinate,y_coordinate,BRICK_WIDTH,BRICK_HEIGHT);
+			 if(i==0 || i==1)
+				{
+					brick[i][j].setFilled(true);
+					brick[i][j].setFillColor(Color.RED);
+					
+				}
+			 else if(i==2 || i==3)
+			 {
+				 brick[i][j].setFilled(true);
+				 brick[i][j].setFillColor(Color.ORANGE);
+				 
+			 }
+			 else if(i==4 || i==5)
+			 {
+				 brick[i][j].setFilled(true);
+				 brick[i][j].setFillColor(Color.YELLOW);
+				 
+			 }
+			 else if(i==6 || i==7)
+			 {
+				 brick[i][j].setFilled(true);
+				 brick[i][j].setFillColor(Color.GREEN);
+				 
+			 }
+			 else if(i==8 || i==9)
+			 {
+				 brick[i][j].setFilled(true);
+				 brick[i][j].setFillColor(Color.CYAN);
+				 
+			 }
+			 add(brick[i][j]);
+			 x_coordinate=x_coordinate+BRICK_SEP*NBRICK_ROWS;
+			 }
+			 y_coordinate=y_coordinate+BRICK_HEIGHT+2;
+		 }
+ 	}
+ 	
+ 	private void drawPaddle() {
+		
+ 		double x = WIDTH/2; 
+		
+		double y = HEIGHT - PADDLE_Y_OFFSET;
+		
+		paddle = new GRect (x, y, PADDLE_WIDTH, PADDLE_HEIGHT);
+		
+		paddle.setFilled(true);
+		
+		add (paddle);
+		
+		addMouseListeners();
+	}
+ 	
+ 	public void mouseMoved(MouseEvent e) {
+	 	
+			if(PADDLE_WIDTH - e.getX() > 0)
+				paddle.setLocation(0, getHeight() - PADDLE_Y_OFFSET);		
 
+			else
+				paddle.setLocation(e.getX() - PADDLE_WIDTH, getHeight() - PADDLE_Y_OFFSET);	
+	}
+ 	
+ 	
+ 	private void drawBall(){
+ 		
+ 		double x_coordinate = (WIDTH+PADDLE_WIDTH)/2; 
+		double y_coordinate = HEIGHT-PADDLE_Y_OFFSET-10;
+		boolean x_coordinate_flag = false;
+		boolean y_coordinate_flag = false;
+		
+		
+		int randomMovment = rgen.nextInt(1,2);
+		//double randomMovment=	ballVelocity();
+		
+		if(randomMovment == 1){
+		 x_coordinate_flag = false;
+		 y_coordinate_flag = false;
+		}
+		
+		else if(randomMovment == 2){
+			x_coordinate_flag = true;
+			 y_coordinate_flag = true;
+		}
+
+		while(true){
+		
+		
+		ball = new GOval(x_coordinate, y_coordinate, BALL_RADIUS, BALL_RADIUS);
+		ball.setColor(Color.BLACK);
+		
+		ball.setFilled(true);
+		add(ball);
+		
+		try {
+			Thread.sleep(sleep);
+		} catch (InterruptedException e) {
+			
+			e.printStackTrace();
+		}
+	
+	    //x direction
+	    
+	    if(x_coordinate >= WIDTH-10)
+	    	x_coordinate_flag = true;
+	    
+	    else if(x_coordinate <= 0)
+	    	x_coordinate_flag = false;
+	    
+	    
+	    
+	    // y direction...
+	    if(y_coordinate < 0){
+	    	y_coordinate_flag = true;
+	    }
+	    
+	    else if(y_coordinate >= (HEIGHT-PADDLE_Y_OFFSET - 7)){
+	    	y_coordinate_flag = false;
+	    	
+	    	if(getElementAt(x_coordinate, y_coordinate + 7) == null)		//exit condition, if paddle not found...
+	    	{
+	    		break;
+	    	}
+	    }
+
+	    
+	    for(int i = 0; i<NBRICK_ROWS; i++)
+	    {
+	    	for(int j = 0; j<NBRICKS_PER_ROW; j++)
+	    	{
+	    		GObject removeBricks = getElementAt(x_coordinate, y_coordinate);
+	    		
+	    		if(removeBricks != null)
+	    		{
+	    			remove(removeBricks);
+	    			y_coordinate_flag = true;
+	    			bricks_counter--;
+	    			
+	    		}
+	    	}
+	    }
+	    
+
+	    // moving the ball in x and y...
+	    
+	    if(x_coordinate_flag == true)
+	    	x_coordinate-=4;
+	    
+	    else
+	    	x_coordinate+=4;	    
+	    
+	    
+	    if(y_coordinate_flag == true){
+	    	y_coordinate+=4;
+	    }
+	    
+	    else{
+	    	y_coordinate-=4;
+	    }
+	    
+	   remove(ball);
+		
+		}
+		
+	    
+ 	}
+ 	
+private double ballVelocity() {
+		
+		vx = rgen.nextDouble(1.0, 3.0);
+		vy = 4.0;
+		if (rgen.nextBoolean(0.5)) {
+			vx = -vx; 
+		}
+		
+		return ballVelocity();
+		
+	}
+ 	
+ 	
+ 	private void startGame(){
+ 		
+ 		 GLabel start = new GLabel ("Click TO Start The Game", WIDTH/4-50,HEIGHT/2); 
+ 		start.setColor(rgen.nextColor());
+		start.setFont("Helvetica-24");
+         add (start);
+ 		
+ 		waitForClick();
+ 		remove(start);
+ 		setUpGame();		
+		}
+ 	
+ 	private void removeObjectsAfterTurnIsFinish(){
+ 		remove(ball);
+		remove(paddle);
+		
+		for(int row=0;row<NBRICK_ROWS;row++){
+			for(int column=0;column<NBRICKS_PER_ROW;column++){
+				remove(brick[row][column]);
+			}
+		}
+		
+ 	}
+ 	
+ 	private void gameOver(){
+ 		GLabel over = new GLabel ("Game Over", WIDTH/4+30,HEIGHT/2); 
+ 		over.setColor(rgen.nextColor());
+		over.setFont("Helvetica-24");
+         add (over);
+ 	}
+ 	
+ 	private void gameWinner(){
+ 		GLabel won = new GLabel ("Congragulation You Won The Game", WIDTH/10 - 30,HEIGHT/2); 
+ 		won.setColor(rgen.nextColor());
+		won.setFont("Helvetica-24");
+         add (won);
+ 	}
+ 	
 /* Method: run() */
 /** Runs the Breakout program. */
 	public void run() {
-		/* You fill this in, along with any subsidiary methods */
+		setSize(APPLICATION_WIDTH, APPLICATION_HEIGHT);
+		
+	for(int i=0; i < NTURNS; i++) {
+			
+			startGame();
+			removeObjectsAfterTurnIsFinish();
+			if(bricks_counter==0)
+			{
+				break;
+			}
+			
+			}
+	if(bricks_counter!=0){
+		gameOver();
+	}
+	
+	else{
+		gameWinner();
+	}
+		
+		
+		
 	}
 
 }
