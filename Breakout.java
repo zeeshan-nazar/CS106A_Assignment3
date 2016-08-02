@@ -218,6 +218,8 @@ public class Breakout extends GraphicsProgram {
 	    		{
 	    			remove(removeBricks);
 	    			y_coordinate_flag = true;
+	    			bricks_counter--;
+	    			
 	    		}
 	    	}
 	    }
@@ -255,20 +257,48 @@ private double ballVelocity() {
 			vx = -vx; 
 		}
 		
-		return vx;
+		return ballVelocity();
 		
 	}
  	
  	
  	private void startGame(){
+ 		
+ 		 GLabel start = new GLabel ("Click TO Start The Game", WIDTH/4-50,HEIGHT/2); 
+ 		start.setColor(rgen.nextColor());
+		start.setFont("Helvetica-24");
+         add (start);
+ 		
  		waitForClick();
+ 		remove(start);
  		setUpGame();		
 		}
  	
- 		
+ 	private void removeObjectsAfterTurnIsFinish(){
+ 		remove(ball);
+		remove(paddle);
+		
+		for(int row=0;row<NBRICK_ROWS;row++){
+			for(int column=0;column<NBRICKS_PER_ROW;column++){
+				remove(brick[row][column]);
+			}
+		}
+		
+ 	}
  	
+ 	private void gameOver(){
+ 		GLabel over = new GLabel ("Game Over", WIDTH/4+30,HEIGHT/2); 
+ 		over.setColor(rgen.nextColor());
+		over.setFont("Helvetica-24");
+         add (over);
+ 	}
  	
-
+ 	private void gameWinner(){
+ 		GLabel won = new GLabel ("Congragulation You Won The Game", WIDTH/10 - 30,HEIGHT/2); 
+ 		won.setColor(rgen.nextColor());
+		won.setFont("Helvetica-24");
+         add (won);
+ 	}
  	
 /* Method: run() */
 /** Runs the Breakout program. */
@@ -278,10 +308,20 @@ private double ballVelocity() {
 	for(int i=0; i < NTURNS; i++) {
 			
 			startGame();
-			remove(ball);
-			remove(paddle);
+			removeObjectsAfterTurnIsFinish();
+			if(bricks_counter==0)
+			{
+				break;
+			}
 			
-			} 
+			}
+	if(bricks_counter!=0){
+		gameOver();
+	}
+	
+	else{
+		gameWinner();
+	}
 		
 		
 		
